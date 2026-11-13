@@ -1,9 +1,13 @@
 package com.compiler.analyzer;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class AnalysisReport {
+    @Getter
     public static class RelationshipEntry {
         private final String controllerName;
         private final String methodName;
@@ -42,45 +46,6 @@ public class AnalysisReport {
             this.statusMessage = statusMessage;
         }
 
-        public boolean isValid() {
-            return valid;
-        }
-
-        public String getControllerName() {
-            return controllerName;
-        }
-
-        public String getMethodName() {
-            return methodName;
-        }
-
-        public String getHttpMethod() {
-            return httpMethod;
-        }
-
-        public String getEndpointPath() {
-            return endpointPath;
-        }
-
-        public String getReturnedTemplate() {
-            return returnedTemplate;
-        }
-
-        public List<String> getModelAttributes() {
-            return modelAttributes;
-        }
-
-        public List<String> getResolvedVariables() {
-            return resolvedVariables;
-        }
-
-        public List<String> getUnresolvedVariables() {
-            return unresolvedVariables;
-        }
-
-        public String getStatusMessage() {
-            return statusMessage;
-        }
     }
 
     private final List<RelationshipEntry> relationships = new ArrayList<>();
@@ -92,14 +57,6 @@ public class AnalysisReport {
 
     public void addDiagnostic(Diagnostic diag) {
         diagnostics.add(diag);
-    }
-
-    public List<RelationshipEntry> getRelationships() {
-        return relationships;
-    }
-
-    public List<Diagnostic> getDiagnostics() {
-        return diagnostics;
     }
 
     public long getErrorCount() {

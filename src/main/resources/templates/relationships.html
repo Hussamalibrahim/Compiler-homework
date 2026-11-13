@@ -19,7 +19,7 @@
                         <h3 class="card-title">🔗 Controller - Template Relationship Analysis</h3>
                         <p class="card-subtitle">
                             Total Relationships: <strong th:text="${result.relationshipsCount}">5</strong> |
-                            Showing: <strong id="relVisibleCount" th:text="${result.relationshipsCount}">5</strong> |
+                            Filtered: <strong th:text="${relationships.size()}">5</strong> |
                             Valid: <span class="badge badge-success" th:text="${result.validRelationshipsCount}">4</span> |
                             Invalid: <span class="badge badge-danger" th:text="${result.invalidRelationshipsCount}">1</span>
                         </p>
@@ -27,25 +27,31 @@
                 </div>
 
                 <div class="card-body">
-                    <!-- Filters and Search -->
+                    <!-- Filters and Search (Server-side links & form - Zero JS!) -->
                     <div class="filter-pills">
-                        <button type="button" class="filter-pill rel-filter-pill active" data-filter="ALL">All Relationships</button>
-                        <button type="button" class="filter-pill rel-filter-pill" data-filter="VALID">Valid Only [OK]</button>
-                        <button type="button" class="filter-pill rel-filter-pill" data-filter="INVALID">Invalid Only [FAIL]</button>
+                        <a th:href="@{/relationships(filter='ALL', search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedFilter == 'ALL'} ? 'active' : ''">All Relationships</a>
+                        <a th:href="@{/relationships(filter='VALID', search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedFilter == 'VALID'} ? 'active' : ''">Valid Only [OK]</a>
+                        <a th:href="@{/relationships(filter='INVALID', search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedFilter == 'INVALID'} ? 'active' : ''">Invalid Only [FAIL]</a>
                     </div>
 
-                    <div class="ast-toolbar">
+                    <form th:action="@{/relationships}" method="get" class="ast-toolbar">
+                        <input type="hidden" name="filter" th:value="${selectedFilter}" />
                         <div class="search-input-wrapper" style="flex: 1; max-width: 450px;">
                             <span class="search-icon">🔍</span>
-                            <input type="text" id="relSearchInput" class="form-control search-input" placeholder="Search endpoint, controller, or template..." />
+                            <input type="text" name="search" class="form-control search-input"
+                                   th:value="${searchQuery}" placeholder="Search endpoint, controller, or template and press Enter..." />
                         </div>
-                    </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+                        <a th:href="@{/relationships}" class="btn btn-secondary btn-sm" th:if="${selectedFilter != 'ALL' || !searchQuery.isEmpty()}">Reset</a>
+                    </form>
 
                     <!-- Flow Cards List -->
-                    <div class="rel-grid" id="relationshipsList">
-                        <div class="rel-card" th:each="rel : ${result.relationships}"
-                             th:classappend="${rel.valid} ? 'rel-valid' : 'rel-invalid'"
-                             th:attr="data-valid=${rel.valid}">
+                    <div class="rel-grid">
+                        <div class="rel-card" th:each="rel : ${relationships}"
+                             th:classappend="${rel.valid} ? 'rel-valid' : 'rel-invalid'">
 
                             <!-- Card Header -->
                             <div class="rel-header">
@@ -108,10 +114,10 @@
                             </div>
                         </div>
 
-                        <div th:if="${result.relationships.isEmpty()}" class="empty-state">
+                        <div th:if="${relationships.isEmpty()}" class="empty-state">
                             <div class="empty-state-icon">🔗</div>
-                            <div class="empty-state-title">No Relationships Found</div>
-                            <div class="empty-state-desc">Make sure the project contains Spring Boot @Controller classes returning view names.</div>
+                            <div class="empty-state-title">No Matching Relationships Found</div>
+                            <div class="empty-state-desc">Try clearing the search query or reset the filter.</div>
                         </div>
                     </div>
                 </div>
@@ -122,9 +128,5 @@
         <footer th:replace="~{fragments/footer :: footer}"></footer>
     </div>
 </div>
-
-<!-- Scripts -->
-<script th:src="@{/js/main.js}"></script>
-<script th:src="@{/js/relationships.js}"></script>
 </body>
 </html>

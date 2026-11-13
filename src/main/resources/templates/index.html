@@ -36,20 +36,18 @@
                                        placeholder="e.g. test-project or D:/path/to/project" required />
                             </div>
 
-                            <div style="margin-bottom: 20px;">
-                                <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Quick Presets:</span>
-                                <div style="display: flex; gap: 8px; margin-top: 6px;">
-                                    <button type="button" class="btn btn-secondary btn-sm"
-                                            onclick="document.getElementById('pathInput').value = 'test-project';">
-                                        Default Sample: test-project
-                                    </button>
-                                </div>
-                            </div>
-
                             <button type="submit" class="btn btn-primary">
                                 <span>🚀 Run Lexer, Parser & Analyzer</span>
                             </button>
                         </form>
+
+                        <div style="margin-top: 16px;">
+                            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Quick Action:</span>
+                            <form th:action="@{/compile}" method="post" style="display: inline-block; margin-left: 8px;">
+                                <input type="hidden" name="path" value="test-project" />
+                                <button type="submit" class="btn btn-secondary btn-sm">Load Default: test-project</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
@@ -135,8 +133,5 @@
         <footer th:replace="~{fragments/footer :: footer}"></footer>
     </div>
 </div>
-
-<!-- Scripts -->
-<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

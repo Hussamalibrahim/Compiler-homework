@@ -51,30 +51,49 @@ public class CompilerWebControllerTest {
     }
 
     @Test
-    public void testAstView() throws Exception {
-        mockMvc.perform(get("/ast"))
+    public void testAstViewTree() throws Exception {
+        mockMvc.perform(get("/ast").param("view", "tree"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("ast"))
                 .andExpect(model().attributeExists("result"))
-                .andExpect(model().attribute("activePage", "ast"));
+                .andExpect(model().attribute("viewMode", "tree"));
     }
 
     @Test
-    public void testSymbolsView() throws Exception {
-        mockMvc.perform(get("/symbols"))
+    public void testAstViewRaw() throws Exception {
+        mockMvc.perform(get("/ast").param("view", "raw"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("ast"))
+                .andExpect(model().attribute("viewMode", "raw"));
+    }
+
+    @Test
+    public void testSymbolsViewFiltered() throws Exception {
+        mockMvc.perform(get("/symbols")
+                        .param("type", "CONTROLLER")
+                        .param("scope", "ALL")
+                        .param("search", "Product"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("symbols"))
-                .andExpect(model().attributeExists("result"))
-                .andExpect(model().attribute("activePage", "symbols"));
+                .andExpect(model().attributeExists("symbols"))
+                .andExpect(model().attribute("selectedType", "CONTROLLER"));
     }
 
     @Test
-    public void testRelationshipsView() throws Exception {
-        mockMvc.perform(get("/relationships"))
+    public void testSymbolsExportCsv() throws Exception {
+        mockMvc.perform(get("/symbols/export"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "text/csv; charset=UTF-8"))
+                .andExpect(header().string("Content-Disposition", "attachment; filename=\"symbols.csv\""));
+    }
+
+    @Test
+    public void testRelationshipsViewFiltered() throws Exception {
+        mockMvc.perform(get("/relationships").param("filter", "VALID"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("relationships"))
-                .andExpect(model().attributeExists("result"))
-                .andExpect(model().attribute("activePage", "relationships"));
+                .andExpect(model().attributeExists("relationships"))
+                .andExpect(model().attribute("selectedFilter", "VALID"));
     }
 
     @Test
