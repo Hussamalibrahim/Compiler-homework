@@ -39,7 +39,6 @@ public class CompilerService {
 
     @PostConstruct
     public void init() {
-        // Attempt to load the default sample project on startup
         try {
             Path defaultPath = resolveProjectPath("test-project");
             if (Files.exists(defaultPath)) {

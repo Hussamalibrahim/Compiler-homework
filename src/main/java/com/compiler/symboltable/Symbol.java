@@ -1,5 +1,8 @@
 package com.compiler.symboltable;
 
+import lombok.Getter;
+
+@Getter
 public class Symbol {
     private final String name;
     private final SymbolType type;
@@ -19,30 +22,6 @@ public class Symbol {
 
     public Symbol(String name, SymbolType type, String scopeName, String sourceFile, int lineNumber) {
         this(name, type, scopeName, sourceFile, lineNumber, "");
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public SymbolType getType() {
-        return type;
-    }
-
-    public String getScopeName() {
-        return scopeName;
-    }
-
-    public String getSourceFile() {
-        return sourceFile;
-    }
-
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    public String getExtraDetails() {
-        return extraDetails;
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.compiler.service.CompilationResult;
 import com.compiler.service.CompilerService;
 import com.compiler.symboltable.Symbol;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,14 +19,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
+@AllArgsConstructor
 public class CompilerWebController {
 
     private final CompilerService compilerService;
-
-    @Autowired
-    public CompilerWebController(CompilerService compilerService) {
-        this.compilerService = compilerService;
-    }
 
     @GetMapping("/")
     public String root() {

@@ -1,7 +1,9 @@
 package com.compiler.ast;
 
 import com.compiler.visitor.ASTVisitor;
+import lombok.Getter;
 
+@Getter
 public class ProjectNode extends ASTNode {
     private final String projectName;
 
@@ -14,9 +16,6 @@ public class ProjectNode extends ASTNode {
         this(projectName, 1);
     }
 
-    public String getProjectName() {
-        return projectName;
-    }
 
     @Override
     public void accept(ASTVisitor visitor) {

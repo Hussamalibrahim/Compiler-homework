@@ -2,9 +2,12 @@ package com.compiler.ast.java;
 
 import com.compiler.ast.ASTNode;
 import com.compiler.visitor.ASTVisitor;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class ClassNode extends ASTNode {
     private final String className;
     private final String packageName;
@@ -16,14 +19,6 @@ public class ClassNode extends ASTNode {
         super("ClassNode: " + className, lineNumber, sourceFile);
         this.className = className;
         this.packageName = packageName != null ? packageName : "";
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public String getPackageName() {
-        return packageName;
     }
 
     public void addAnnotation(AnnotationNode annotation) {
@@ -45,18 +40,6 @@ public class ClassNode extends ASTNode {
             fields.add(field);
             addChild(field);
         }
-    }
-
-    public List<AnnotationNode> getAnnotations() {
-        return annotations;
-    }
-
-    public List<MethodNode> getMethods() {
-        return methods;
-    }
-
-    public List<VariableNode> getFields() {
-        return fields;
     }
 
     @Override

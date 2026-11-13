@@ -1,10 +1,13 @@
 package com.compiler.ast;
 
 import com.compiler.visitor.ASTVisitor;
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Getter
 public abstract class ASTNode {
     private final String nodeName;
     private final int lineNumber;
@@ -19,18 +22,6 @@ public abstract class ASTNode {
 
     public ASTNode(String nodeName, int lineNumber) {
         this(nodeName, lineNumber, "");
-    }
-
-    public String getNodeName() {
-        return nodeName;
-    }
-
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    public String getSourceFile() {
-        return sourceFile;
     }
 
     public void addChild(ASTNode child) {

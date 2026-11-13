@@ -8,10 +8,12 @@ import com.compiler.ast.css.CssSelectorNode;
 import com.compiler.ast.css.StyleSheetNode;
 import com.compiler.ast.html.*;
 import com.compiler.ast.java.*;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class ASTNodeDto {
     private final String nodeType;
     private final String nodeName;
@@ -26,30 +28,6 @@ public class ASTNodeDto {
         this.lineNumber = lineNumber;
         this.sourceFile = sourceFile != null ? sourceFile : "";
         this.category = category;
-    }
-
-    public String getNodeType() {
-        return nodeType;
-    }
-
-    public String getNodeName() {
-        return nodeName;
-    }
-
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    public String getSourceFile() {
-        return sourceFile;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public List<ASTNodeDto> getChildren() {
-        return children;
     }
 
     public void addChild(ASTNodeDto child) {

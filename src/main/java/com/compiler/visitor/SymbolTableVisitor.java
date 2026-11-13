@@ -5,10 +5,11 @@ import com.compiler.ast.ProjectNode;
 import com.compiler.ast.java.*;
 import com.compiler.ast.html.*;
 import com.compiler.ast.css.*;
-import com.compiler.symboltable.Symbol;
 import com.compiler.symboltable.SymbolTable;
 import com.compiler.symboltable.SymbolType;
+import lombok.Getter;
 
+@Getter
 public class SymbolTableVisitor implements ASTVisitor {
     private final SymbolTable symbolTable;
 
@@ -18,10 +19,6 @@ public class SymbolTableVisitor implements ASTVisitor {
 
     public SymbolTableVisitor() {
         this(new SymbolTable());
-    }
-
-    public SymbolTable getSymbolTable() {
-        return symbolTable;
     }
 
     @Override

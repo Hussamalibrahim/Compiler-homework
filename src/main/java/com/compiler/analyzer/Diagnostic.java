@@ -1,5 +1,8 @@
 package com.compiler.analyzer;
 
+import lombok.Getter;
+
+@Getter
 public class Diagnostic {
     public enum Severity {
         ERROR,
@@ -19,26 +22,6 @@ public class Diagnostic {
         this.sourceFile = sourceFile != null ? sourceFile : "";
         this.lineNumber = lineNumber;
         this.category = category != null ? category : "GENERAL";
-    }
-
-    public Severity getSeverity() {
-        return severity;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getSourceFile() {
-        return sourceFile;
-    }
-
-    public int getLineNumber() {
-        return lineNumber;
-    }
-
-    public String getCategory() {
-        return category;
     }
 
     @Override

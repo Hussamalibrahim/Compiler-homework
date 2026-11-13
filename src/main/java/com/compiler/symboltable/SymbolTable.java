@@ -1,9 +1,11 @@
 package com.compiler.symboltable;
 
-import java.util.ArrayList;
+import lombok.Getter;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
 public class SymbolTable {
     private final Scope rootScope;
     private Scope currentScope;
@@ -13,24 +15,14 @@ public class SymbolTable {
         this.currentScope = this.rootScope;
     }
 
-    public Scope getRootScope() {
-        return rootScope;
-    }
-
-    public Scope getCurrentScope() {
-        return currentScope;
-    }
-
-    public Scope enterScope(String scopeName) {
+    public void enterScope(String scopeName) {
         currentScope = new Scope(scopeName, currentScope);
-        return currentScope;
     }
 
-    public Scope exitScope() {
+    public void exitScope() {
         if (currentScope.getParentScope() != null) {
             currentScope = currentScope.getParentScope();
         }
-        return currentScope;
     }
 
     public void resetToRoot() {

@@ -1,7 +1,10 @@
 package com.compiler.symboltable;
 
+import lombok.Getter;
+
 import java.util.*;
 
+@Getter
 public class Scope {
     private final String scopeName;
     private final Scope parentScope;
@@ -16,17 +19,6 @@ public class Scope {
         }
     }
 
-    public String getScopeName() {
-        return scopeName;
-    }
-
-    public Scope getParentScope() {
-        return parentScope;
-    }
-
-    public List<Scope> getChildScopes() {
-        return Collections.unmodifiableList(childScopes);
-    }
 
     public void define(Symbol symbol) {
         if (symbol == null) return;
