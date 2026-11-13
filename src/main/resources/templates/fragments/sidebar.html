@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside th:fragment="sidebar(activePage)" class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-badge">&lt;/&gt;</div>
+        <div class="logo-text">
+            <h1>AST Compiler</h1>
+            <p>Spring Boot & Thymeleaf</p>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        
+        <a th:href="@{/dashboard}" class="nav-item" th:classappend="${activePage == 'dashboard'} ? 'active' : ''">
+            <span class="nav-icon">📊</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a th:href="@{/ast}" class="nav-item" th:classappend="${activePage == 'ast'} ? 'active' : ''">
+            <span class="nav-icon">🌳</span>
+            <span>AST Visualizer</span>
+            <span class="nav-badge nav-badge-success" th:if="${result != null && result.astNodesCount > 0}" th:text="${result.astNodesCount} + ' nodes'">0</span>
+        </a>
+
+        <a th:href="@{/symbols}" class="nav-item" th:classappend="${activePage == 'symbols'} ? 'active' : ''">
+            <span class="nav-icon">📋</span>
+            <span>Symbol Table</span>
+            <span class="nav-badge nav-badge-success" th:if="${result != null && result.totalSymbolsCount > 0}" th:text="${result.totalSymbolsCount}">0</span>
+        </a>
+
+        <a th:href="@{/relationships}" class="nav-item" th:classappend="${activePage == 'relationships'} ? 'active' : ''">
+            <span class="nav-icon">🔗</span>
+            <span>Relationships</span>
+            <span class="nav-badge nav-badge-success" th:if="${result != null && result.relationshipsCount > 0}" th:text="${result.relationshipsCount}">0</span>
+        </a>
+
+        <a th:href="@{/analysis}" class="nav-item" th:classappend="${activePage == 'analysis'} ? 'active' : ''">
+            <span class="nav-icon">⚠️</span>
+            <span>Diagnostics & Errors</span>
+            <span class="nav-badge nav-badge-danger" th:if="${result != null && result.errorCount > 0}" th:text="${result.errorCount}">0</span>
+            <span class="nav-badge nav-badge-success" th:if="${result != null && result.errorCount == 0}">OK</span>
+        </a>
+
+        <div class="nav-section-title">Configuration</div>
+
+        <a th:href="@{/index}" class="nav-item" th:classappend="${activePage == 'index'} ? 'active' : ''">
+            <span class="nav-icon">⚙️</span>
+            <span>Select Project / Upload</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="project-pill">
+            <div class="project-pill-label">Active Project</div>
+            <div class="project-pill-name" th:text="${result != null && result.projectName != null ? result.projectName : 'No Project Selected'}">test-project</div>
+        </div>
+    </div>
+</aside>
+</body>
+</html>

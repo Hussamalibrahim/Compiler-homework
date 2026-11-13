@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Diagnostics & Analysis')}"></head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <th:block th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></th:block>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Topbar Navbar -->
+        <header th:replace="~{fragments/navbar :: navbar('Diagnostics & Analysis Report')}"></header>
+
+        <!-- Body Content -->
+        <main class="content-body">
+            <!-- Overall Status Alert -->
+            <div class="alert alert-success" th:if="${result.errorCount == 0 && result.warningCount == 0}">
+                <span>✅ <strong>Excellent!</strong> No syntax or semantic errors found. All controller endpoints, templates, and model attributes are fully valid.</span>
+            </div>
+
+            <div class="alert alert-danger" th:if="${result.errorCount > 0}">
+                <span>⚠️ <strong>Diagnostics Alert:</strong> Detected <span th:text="${result.errorCount}">1</span> error(s) and <span th:text="${result.warningCount}">0</span> warning(s) in the analyzed codebase.</span>
+            </div>
+
+            <!-- Diagnostics List Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">🔍 Syntax & Semantic Diagnostics</h3>
+                        <p class="card-subtitle">
+                            Errors: <span class="badge badge-danger" th:text="${result.errorCount}">1</span> |
+                            Warnings: <span class="badge badge-warning" th:text="${result.warningCount}">0</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="diag-list">
+                        <div class="diag-item" th:each="d : ${result.diagnostics}"
+                             th:classappend="${d.severity.name() == 'ERROR'} ? 'diag-error' : 'diag-warning'">
+                            
+                            <!-- Icon -->
+                            <div class="diag-icon"
+                                 th:classappend="${d.severity.name() == 'ERROR'} ? 'error-icon' : 'warning-icon'">
+                                <span th:if="${d.severity.name() == 'ERROR'}">⛔</span>
+                                <span th:if="${d.severity.name() == 'WARNING'}">⚠️</span>
+                            </div>
+
+                            <!-- Body -->
+                            <div class="diag-body">
+                                <div class="diag-header">
+                                    <span class="badge"
+                                          th:classappend="${d.severity.name() == 'ERROR'} ? 'badge-danger' : 'badge-warning'"
+                                          th:text="${d.severity}">ERROR</span>
+
+                                    <span class="diag-category-tag"
+                                          th:classappend="'cat-' + ${#strings.toLowerCase(d.category).replace('_', '-')}"
+                                          th:text="${d.category}">MISSING_TEMPLATE</span>
+                                </div>
+
+                                <div class="diag-message" th:text="${d.message}">
+                                    Missing template 'products/missing_template' returned by controller method 'ProductController.errorEndpoint()'
+                                </div>
+
+                                <div class="diag-meta">
+                                    <span>File: <code class="diag-meta-file" th:text="${d.sourceFile}">ProductController.java</code></span>
+                                    <span th:if="${d.lineNumber > 0}">Line: <span class="diag-meta-line" th:text="${d.lineNumber}">44</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div th:if="${result.diagnostics.isEmpty()}" class="empty-state">
+                            <div class="empty-state-icon">🎉</div>
+                            <div class="empty-state-title">Zero Diagnostics Reported</div>
+                            <div class="empty-state-desc">The analyzed application has no compile errors or broken template bindings!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compiler Validation Scope Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📖 Compiler Semantic & Syntax Rules Supported</h3>
+                </div>
+                <div class="card-body">
+                    <div class="dashboard-grid">
+                        <div>
+                            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">1. Syntax Parsing Rules</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+                                Custom Lexers and Parsers tokenize Java source files, HTML templates with Thymeleaf attributes (<code>th:text</code>, <code>th:each</code>, <code>th:href</code>, etc.), and CSS stylesheets. Syntax errors report precise token positions and line numbers.
+                            </p>
+
+                            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">2. Missing Template Rule</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                                Detects when a Spring Boot <code>@Controller</code> handler method returns a view name (e.g. <code>return "products/list";</code>) that does not correspond to any existing template in <code>resources/templates/</code>.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">3. Variable Resolution Rule</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+                                Validates that expressions evaluated in Thymeleaf templates (e.g. <code>${product.name}</code>, <code>th:each="p : ${products}"</code>) are explicitly passed into Spring's <code>Model</code> from the corresponding controller method or defined via local loop iteration variables.
+                            </p>
+
+                            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">4. Unused Model Attribute Warning</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                                Flags model attributes added via <code>model.addAttribute("key", value)</code> that are never referenced by the target template.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

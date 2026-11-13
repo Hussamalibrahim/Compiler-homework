@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Select Project')}"></head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <th:block th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></th:block>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Topbar Navbar -->
+        <header th:replace="~{fragments/navbar :: navbar('Project Source Selection & Upload')}"></header>
+
+        <!-- Body Content -->
+        <main class="content-body">
+            <!-- Flash Alerts -->
+            <div class="alert alert-success" th:if="${alertSuccess}" th:text="${alertSuccess}"></div>
+            <div class="alert alert-warning" th:if="${alertWarning}" th:text="${alertWarning}"></div>
+            <div class="alert alert-danger" th:if="${alertError}" th:text="${alertError}"></div>
+
+            <div class="dashboard-grid">
+                <!-- Option 1: Directory Selection -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">📂 Analyze Local Directory</h3>
+                            <p class="card-subtitle">Specify path to any Spring Boot project root directory</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/compile}" method="post">
+                            <div class="form-group">
+                                <label class="form-label" for="pathInput">Project Directory Path:</label>
+                                <input type="text" id="pathInput" name="path" class="form-control"
+                                       th:value="${result != null && result.projectPath != null ? result.projectPath : 'test-project'}"
+                                       placeholder="e.g. test-project or D:/path/to/project" required />
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Quick Presets:</span>
+                                <div style="display: flex; gap: 8px; margin-top: 6px;">
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                            onclick="document.getElementById('pathInput').value = 'test-project';">
+                                        Default Sample: test-project
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <span>🚀 Run Lexer, Parser & Analyzer</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Option 2: Upload ZIP Archive -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">📦 Upload Project Archive (ZIP)</h3>
+                            <p class="card-subtitle">Upload a ZIP containing Java, HTML templates, and CSS files</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/upload}" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label class="form-label" for="projectFileInput">Select .ZIP Archive:</label>
+                                <input type="file" id="projectFileInput" name="projectFile" class="form-control" accept=".zip" required />
+                            </div>
+
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">
+                                The uploaded archive will be automatically unpacked safely, scanned, parsed, and analyzed for syntax trees, symbols, and controller-template relationships.
+                            </p>
+
+                            <button type="submit" class="btn btn-primary">
+                                <span>📤 Upload & Analyze Project</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architecture Overview Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">⚙️ Compiler Architecture & Specifications</h3>
+                </div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-icon-primary">1</div>
+                            <div class="stat-content">
+                                <div style="font-weight: 700; font-size: 14px;">Lexer & Parser</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                                    Independent tokenizers and syntax parsers for Java, HTML (with Thymeleaf directives), and CSS stylesheets.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-icon-success">2</div>
+                            <div class="stat-content">
+                                <div style="font-weight: 700; font-size: 14px;">Abstract Syntax Tree (AST)</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                                    OOP hierarchy with line tracking, node polymorphic traversal using the Visitor Design Pattern.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-icon-warning">3</div>
+                            <div class="stat-content">
+                                <div style="font-weight: 700; font-size: 14px;">Scoped Symbol Table</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                                    Hierarchical symbol tracking supporting classes, methods, endpoints, model attributes, templates, and iterations.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-icon-purple">4</div>
+                            <div class="stat-content">
+                                <div style="font-weight: 700; font-size: 14px;">Semantic Analysis</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                                    Verifies controller endpoint bindings, returned template files, and referenced Thymeleaf model variables.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

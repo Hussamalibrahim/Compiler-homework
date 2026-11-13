@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Add Product</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+    <div class="form-container">
+        <h2>Add New Product</h2>
+        <form th:action="@{/products/add}" method="post">
+            <div class="form-group">
+                <label>Product Name:</label>
+                <input type="text" name="name" th:value="${product.name}" required="required" />
+            </div>
+
+            <div class="form-group">
+                <label>Price:</label>
+                <input type="number" name="price" th:value="${product.price}" step="0.01" required="required" />
+            </div>
+
+            <div class="form-group">
+                <label>Description:</label>
+                <textarea name="description" th:text="${product.description}"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Image URL:</label>
+                <input type="text" name="image" th:value="${product.image}" />
+            </div>
+
+            <button type="submit" class="btn-primary">Save Product</button>
+            <a class="btn-cancel" th:href="@{/products}">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

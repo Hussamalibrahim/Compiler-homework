@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('AST Visualizer')}"></head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <th:block th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></th:block>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Topbar Navbar -->
+        <header th:replace="~{fragments/navbar :: navbar('Abstract Syntax Tree (AST)')}"></header>
+
+        <!-- Body Content -->
+        <main class="content-body">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">🌳 Abstract Syntax Tree Visualization</h3>
+                        <p class="card-subtitle">
+                            Total Nodes: <strong th:text="${result.astNodesCount}">128</strong> |
+                            Root: <code th:text="${result.projectName}">SpringBootThymeleafApp</code>
+                        </p>
+                    </div>
+                    <div class="ast-toolbar-group">
+                        <a th:href="@{/ast(view='tree')}" class="btn btn-sm"
+                           th:classappend="${viewMode == 'tree'} ? 'btn-primary' : 'btn-secondary'">Interactive Tree</a>
+                        <a th:href="@{/ast(view='raw')}" class="btn btn-sm"
+                           th:classappend="${viewMode == 'raw'} ? 'btn-primary' : 'btn-secondary'">ASCII Hierarchy</a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- 1. Interactive Visual Tree View (Pure HTML5 <details>/<summary> - Zero JS!) -->
+                    <div th:if="${viewMode == 'tree'}">
+                        <ul class="tree-root" th:if="${result.astDto != null}">
+                            <!-- Call Recursive Fragment -->
+                            <th:block th:replace="~{this :: astTreeFragment(${result.astDto})}"></th:block>
+                        </ul>
+                        <div th:if="${result.astDto == null}" class="empty-state">
+                            <div class="empty-state-icon">🌳</div>
+                            <div class="empty-state-title">No AST Generated</div>
+                            <div class="empty-state-desc">Run compiler on a project to build the syntax tree.</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Raw ASCII Output View -->
+                    <div th:if="${viewMode == 'raw'}">
+                        <pre class="ast-raw-view" th:text="${result.astText}">No AST text available.</pre>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+
+<!-- Recursive Thymeleaf Fragment using native HTML5 <details> & <summary> -->
+<th:block th:fragment="astTreeFragment(node)">
+    <li class="tree-item" th:if="${node != null}" th:with="hasKids=${node.children != null and not #lists.isEmpty(node.children)}">
+        <!-- If has children, use collapsible <details> -->
+        <details open class="tree-details" th:if="${hasKids}">
+            <summary class="tree-node-content">
+                <span class="tree-arrow">▶</span>
+                <span class="node-type-tag"
+                      th:classappend="'tag-' + ${#strings.toLowerCase(node.category).replace('_', '-')}"
+                      th:text="${node.category}">PROJECT</span>
+                <span class="node-title-text" th:text="${node.nodeName}">ProjectNode</span>
+                <span class="node-loc" th:if="${node.lineNumber > 0}" th:text="'L' + ${node.lineNumber}">L1</span>
+                <span class="node-file" th:if="${node.sourceFile != null and not #strings.isEmpty(node.sourceFile)}" th:text="'(' + ${node.sourceFile} + ')'">(file.java)</span>
+            </summary>
+
+            <ul>
+                <th:block th:each="child : ${node.children}">
+                    <th:block th:replace="~{this :: astTreeFragment(${child})}"></th:block>
+                </th:block>
+            </ul>
+        </details>
+
+        <!-- Leaf node without children -->
+        <div class="tree-node-content" th:if="${!hasKids}">
+            <span class="tree-arrow">•</span>
+            <span class="node-type-tag"
+                  th:classappend="'tag-' + ${#strings.toLowerCase(node.category).replace('_', '-')}"
+                  th:text="${node.category}">LEAF</span>
+            <span class="node-title-text" th:text="${node.nodeName}">LeafNode</span>
+            <span class="node-loc" th:if="${node.lineNumber > 0}" th:text="'L' + ${node.lineNumber}">L1</span>
+            <span class="node-file" th:if="${node.sourceFile != null and not #strings.isEmpty(node.sourceFile)}" th:text="'(' + ${node.sourceFile} + ')'">(file.java)</span>
+        </div>
+    </li>
+</th:block>
+</body>
+</html>

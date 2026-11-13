@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Controller-Template Relationships')}"></head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <th:block th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></th:block>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Topbar Navbar -->
+        <header th:replace="~{fragments/navbar :: navbar('Controller & Template Relationships')}"></header>
+
+        <!-- Body Content -->
+        <main class="content-body">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">🔗 Controller - Template Relationship Analysis</h3>
+                        <p class="card-subtitle">
+                            Total Relationships: <strong th:text="${result.relationshipsCount}">5</strong> |
+                            Showing: <strong id="relVisibleCount" th:text="${result.relationshipsCount}">5</strong> |
+                            Valid: <span class="badge badge-success" th:text="${result.validRelationshipsCount}">4</span> |
+                            Invalid: <span class="badge badge-danger" th:text="${result.invalidRelationshipsCount}">1</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Filters and Search -->
+                    <div class="filter-pills">
+                        <button type="button" class="filter-pill rel-filter-pill active" data-filter="ALL">All Relationships</button>
+                        <button type="button" class="filter-pill rel-filter-pill" data-filter="VALID">Valid Only [OK]</button>
+                        <button type="button" class="filter-pill rel-filter-pill" data-filter="INVALID">Invalid Only [FAIL]</button>
+                    </div>
+
+                    <div class="ast-toolbar">
+                        <div class="search-input-wrapper" style="flex: 1; max-width: 450px;">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="relSearchInput" class="form-control search-input" placeholder="Search endpoint, controller, or template..." />
+                        </div>
+                    </div>
+
+                    <!-- Flow Cards List -->
+                    <div class="rel-grid" id="relationshipsList">
+                        <div class="rel-card" th:each="rel : ${result.relationships}"
+                             th:classappend="${rel.valid} ? 'rel-valid' : 'rel-invalid'"
+                             th:attr="data-valid=${rel.valid}">
+
+                            <!-- Card Header -->
+                            <div class="rel-header">
+                                <div class="rel-endpoint-group">
+                                    <span class="badge"
+                                          th:classappend="${rel.httpMethod == 'GET'} ? 'badge-http-get' : (${rel.httpMethod == 'POST'} ? 'badge-http-post' : 'badge-gray')"
+                                          th:text="${rel.httpMethod}">GET</span>
+                                    <span class="rel-path" th:text="${rel.endpointPath}">/products</span>
+                                </div>
+                                <div>
+                                    <span class="badge badge-success" th:if="${rel.valid}">VALID [OK]</span>
+                                    <span class="badge badge-danger" th:if="${!rel.valid}">INVALID [FAIL]</span>
+                                </div>
+                            </div>
+
+                            <!-- Flow Columns -->
+                            <div class="rel-flow-diagram">
+                                <!-- 1. Controller Method -->
+                                <div class="rel-flow-col">
+                                    <div class="rel-flow-label">Controller & Method</div>
+                                    <div class="rel-flow-value">
+                                        <span th:text="${rel.controllerName}">ProductController</span>.<span th:text="${rel.methodName}">listProducts</span>()
+                                    </div>
+                                </div>
+
+                                <!-- 2. Model Attributes Passed -->
+                                <div class="rel-flow-col">
+                                    <div class="rel-flow-label">Model Attributes Passed</div>
+                                    <div class="rel-tags-list">
+                                        <span class="tag-model" th:each="attr : ${rel.modelAttributes}" th:text="${attr}">products</span>
+                                        <span class="text-muted" style="font-size: 12px;" th:if="${rel.modelAttributes.isEmpty()}">(none)</span>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Returned Template -->
+                                <div class="rel-flow-col">
+                                    <div class="rel-flow-label">Target View Template</div>
+                                    <div class="rel-flow-value">
+                                        <code th:text="${rel.returnedTemplate}">products/list</code>
+                                    </div>
+                                </div>
+
+                                <!-- 4. Variable Verification -->
+                                <div class="rel-flow-col">
+                                    <div class="rel-flow-label">Resolved Template Variables</div>
+                                    <div class="rel-tags-list">
+                                        <span class="tag-resolved" th:each="var : ${rel.resolvedVariables}" th:text="${var}">${product.name}</span>
+                                        <span class="tag-unresolved" th:each="uvar : ${rel.unresolvedVariables}" th:text="'Unresolved: ' + ${uvar}">Unresolved</span>
+                                        <span class="text-muted" style="font-size: 12px;" th:if="${rel.resolvedVariables.isEmpty() && rel.unresolvedVariables.isEmpty()}">(none)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card Footer -->
+                            <div class="rel-footer">
+                                <div>
+                                    <strong>Status Message:</strong>
+                                    <span th:text="${rel.statusMessage}">Valid</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div th:if="${result.relationships.isEmpty()}" class="empty-state">
+                            <div class="empty-state-icon">🔗</div>
+                            <div class="empty-state-title">No Relationships Found</div>
+                            <div class="empty-state-desc">Make sure the project contains Spring Boot @Controller classes returning view names.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/relationships.js}"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Product Details</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+    <div class="details-card">
+        <img class="details-image" th:src="${product.image}" alt="Product Picture" />
+        <div class="details-info">
+            <h1 class="details-title" th:text="${product.name}">Product Name</h1>
+            <p class="details-price" th:text="${product.price}">$0.00</p>
+            <p class="details-desc" th:text="${product.description}">Product full details and specifications.</p>
+            <div class="details-actions">
+                <a class="btn-primary" th:href="@{/products}">Back to Products</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

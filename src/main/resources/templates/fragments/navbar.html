@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="navbar(pageTitle)" class="topbar">
+    <div class="topbar-left">
+        <div class="page-title-badge">
+            <h1 class="page-title" th:text="${pageTitle}">Dashboard</h1>
+            <span class="badge badge-success" th:if="${result != null && result.errorCount == 0}">● All Checks Passed</span>
+            <span class="badge badge-danger" th:if="${result != null && result.errorCount > 0}" th:text="'● ' + ${result.errorCount} + ' Error(s)'">● Errors</span>
+        </div>
+    </div>
+
+    <div class="topbar-right">
+        <!-- Re-compile form -->
+        <form th:action="@{/compile}" method="post" class="topbar-form">
+            <input type="hidden" name="path" th:value="${result != null && result.projectPath != null ? result.projectPath : 'test-project'}" />
+            <button type="submit" class="btn btn-secondary btn-sm" title="Re-run compiler on current project">
+                <span>🔄 Re-compile</span>
+            </button>
+        </form>
+
+        <a th:href="@{/index}" class="btn btn-primary btn-sm">
+            <span>📂 Open Project</span>
+        </a>
+    </div>
+</header>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Dashboard')}"></head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <th:block th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></th:block>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Topbar Navbar -->
+        <header th:replace="~{fragments/navbar :: navbar('Compiler Dashboard')}"></header>
+
+        <!-- Body Content -->
+        <main class="content-body">
+            <!-- Flash Alerts -->
+            <div class="alert alert-success" th:if="${alertSuccess}" th:text="${alertSuccess}"></div>
+            <div class="alert alert-warning" th:if="${alertWarning}" th:text="${alertWarning}"></div>
+            <div class="alert alert-danger" th:if="${alertError}" th:text="${alertError}"></div>
+
+            <!-- Status Banner -->
+            <div class="status-banner" th:classappend="${result.errorCount == 0} ? 'success-border' : 'error-border'">
+                <div class="status-banner-info">
+                    <h2>
+                        <span th:text="${result.projectName}">test-project</span>
+                        <span class="badge badge-success" th:if="${result.errorCount == 0}">VALID</span>
+                        <span class="badge badge-danger" th:if="${result.errorCount > 0}" th:text="${result.errorCount} + ' ERRORS'">ERRORS</span>
+                    </h2>
+                    <p th:text="${result.statusMessage}">Compiled successfully</p>
+                </div>
+                <div class="status-banner-meta">
+                    <div class="meta-item">
+                        <div class="meta-label">Execution Time</div>
+                        <div class="meta-value" th:text="${result.executionTimeMs} + ' ms'">42 ms</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Scanned At</div>
+                        <div class="meta-value" th:text="${result.scanTimestamp}">2026-11-13 00:00:00</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Files Scanned</div>
+                        <div class="meta-value" th:text="${result.totalFilesCount}">6</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <!-- Java Files -->
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper stat-icon-primary">☕</div>
+                    <div class="stat-content">
+                        <div class="stat-value" th:text="${result.javaFilesCount}">2</div>
+                        <div class="stat-label">Java Sources</div>
+                        <div class="stat-meta" th:text="${result.controllersCount} + ' Controllers, ' + ${result.endpointsCount} + ' Endpoints'">1 Controller, 5 Endpoints</div>
+                    </div>
+                </div>
+
+                <!-- HTML Templates -->
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper stat-icon-purple">📄</div>
+                    <div class="stat-content">
+                        <div class="stat-value" th:text="${result.htmlFilesCount}">3</div>
+                        <div class="stat-label">HTML / Thymeleaf</div>
+                        <div class="stat-meta" th:text="${result.templatesCount} + ' Template AST nodes'">3 Templates</div>
+                    </div>
+                </div>
+
+                <!-- CSS Stylesheets -->
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper stat-icon-info">🎨</div>
+                    <div class="stat-content">
+                        <div class="stat-value" th:text="${result.cssFilesCount}">1</div>
+                        <div class="stat-label">CSS Stylesheets</div>
+                        <div class="stat-meta">Selectors & Declarations</div>
+                    </div>
+                </div>
+
+                <!-- AST Nodes -->
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper stat-icon-success">🌳</div>
+                    <div class="stat-content">
+                        <div class="stat-value" th:text="${result.astNodesCount}">128</div>
+                        <div class="stat-label">Total AST Nodes</div>
+                        <div class="stat-meta">Complete Multi-Syntax Tree</div>
+                    </div>
+                </div>
+
+                <!-- Symbol Table -->
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper stat-icon-warning">📋</div>
+                    <div class="stat-content">
+                        <div class="stat-value" th:text="${result.totalSymbolsCount}">62</div>
+                        <div class="stat-label">Symbol Table Entries</div>
+                        <div class="stat-meta">Scoped Identifiers & Attributes</div>
+                    </div>
+                </div>
+
+                <!-- Relationships -->
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper stat-icon-primary">🔗</div>
+                    <div class="stat-content">
+                        <div class="stat-value" th:text="${result.relationshipsCount}">5</div>
+                        <div class="stat-label">Controller Routes</div>
+                        <div class="stat-meta" th:text="${result.validRelationshipsCount} + ' Valid / ' + ${result.invalidRelationshipsCount} + ' Invalid'">4 Valid / 1 Invalid</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-Column Grid -->
+            <div class="dashboard-grid">
+                <!-- Left Column -->
+                <div class="dashboard-col">
+                    <!-- Project Files Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">📁 Scanned Project Files</h3>
+                                <p class="card-subtitle">Parsed and tokenized source files</p>
+                            </div>
+                            <span class="badge badge-gray" th:text="${result.totalFilesCount} + ' Files'">6 Files</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table-custom">
+                                    <thead>
+                                    <tr>
+                                        <th>File Type</th>
+                                        <th>File Name</th>
+                                        <th>Relative Path</th>
+                                        <th>Lines</th>
+                                        <th>Size</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="f : ${result.files}">
+                                        <td>
+                                            <span class="badge"
+                                                  th:classappend="${f.fileType == 'JAVA'} ? 'file-badge-java' : (${f.fileType == 'HTML'} ? 'file-badge-html' : 'file-badge-css')"
+                                                  th:text="${f.fileType}">JAVA</span>
+                                        </td>
+                                        <td><strong th:text="${f.fileName}">ProductController.java</strong></td>
+                                        <td><code th:text="${f.relativePath}">src/main/java/com/store/ProductController.java</code></td>
+                                        <td th:text="${f.lineCount} + ' lines'">46 lines</td>
+                                        <td th:text="${f.formattedSize}">1.4 KB</td>
+                                    </tr>
+                                    <tr th:if="${result.files.isEmpty()}">
+                                        <td colspan="5" class="empty-state">No files scanned.</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controller-Template Relationships Summary -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">🔗 Controller - Template Relationships</h3>
+                                <p class="card-subtitle">Mapping between Spring Boot Endpoints and Thymeleaf Views</p>
+                            </div>
+                            <a th:href="@{/relationships}" class="btn btn-secondary btn-sm">View Details &rarr;</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table-custom">
+                                    <thead>
+                                    <tr>
+                                        <th>Method</th>
+                                        <th>Endpoint</th>
+                                        <th>Controller Handler</th>
+                                        <th>Returned Template</th>
+                                        <th>Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="rel : ${result.relationships}">
+                                        <td>
+                                            <span class="badge"
+                                                  th:classappend="${rel.httpMethod == 'GET'} ? 'badge-http-get' : (${rel.httpMethod == 'POST'} ? 'badge-http-post' : 'badge-gray')"
+                                                  th:text="${rel.httpMethod}">GET</span>
+                                        </td>
+                                        <td><code th:text="${rel.endpointPath}">/products</code></td>
+                                        <td th:text="${rel.controllerName} + '.' + ${rel.methodName} + '()'">ProductController.listProducts()</td>
+                                        <td><code th:text="${rel.returnedTemplate}">products/list</code></td>
+                                        <td>
+                                            <span class="badge badge-success" th:if="${rel.valid}">VALID [OK]</span>
+                                            <span class="badge badge-danger" th:if="${!rel.valid}">FAIL [ERROR]</span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${result.relationships.isEmpty()}">
+                                        <td colspan="5" class="empty-state">No relationships detected.</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="dashboard-col">
+                    <!-- Health & Diagnostics -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">🛡️ Analysis & Semantic Health</h3>
+                                <p class="card-subtitle">Compilation and relationship verification</p>
+                            </div>
+                            <a th:href="@{/analysis}" class="btn btn-secondary btn-sm">Report</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="summary-row">
+                                <span class="summary-label">⚠️ Total Errors</span>
+                                <span class="badge badge-danger" th:if="${result.errorCount > 0}" th:text="${result.errorCount}">1</span>
+                                <span class="badge badge-success" th:if="${result.errorCount == 0}">0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">⚡ Warnings</span>
+                                <span class="badge badge-warning" th:if="${result.warningCount > 0}" th:text="${result.warningCount}">0</span>
+                                <span class="badge badge-gray" th:if="${result.warningCount == 0}">0</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="summary-label">✅ Valid Endpoints</span>
+                                <span class="summary-value" th:text="${result.validRelationshipsCount} + ' / ' + ${result.relationshipsCount}">4 / 5</span>
+                            </div>
+
+                            <div class="meter-container" th:if="${result.relationshipsCount > 0}">
+                                <div class="meter-label">
+                                    <span>Relationship Integrity</span>
+                                    <span th:text="${(result.validRelationshipsCount * 100) / result.relationshipsCount} + '%'">80%</span>
+                                </div>
+                                <div class="meter-track">
+                                    <div class="meter-fill-success"
+                                         th:style="'width: ' + ${(result.validRelationshipsCount * 100) / result.relationshipsCount} + '%;'"></div>
+                                    <div class="meter-fill-danger"
+                                         th:style="'width: ' + ${(result.invalidRelationshipsCount * 100) / result.relationshipsCount} + '%;'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Symbol Table Breakdown -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">📊 Symbols Breakdown</h3>
+                                <p class="card-subtitle">Categorized extracted symbols</p>
+                            </div>
+                            <a th:href="@{/symbols}" class="btn btn-secondary btn-sm">Table &rarr;</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="summary-row" th:each="entry : ${result.symbolCountsByType}">
+                                <span class="summary-label" th:text="${entry.key}">CLASS</span>
+                                <span class="badge badge-gray" th:text="${entry.value}">1</span>
+                            </div>
+                            <div class="summary-row" th:if="${result.symbolCountsByType.isEmpty()}">
+                                <span class="summary-label">No symbols recorded.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

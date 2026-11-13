@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Symbol Table')}"></head>
+<body>
+<div class="app-container">
+    <!-- Sidebar -->
+    <th:block th:replace="~{fragments/sidebar :: sidebar(${activePage})}"></th:block>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Topbar Navbar -->
+        <header th:replace="~{fragments/navbar :: navbar('Symbol Table Explorer')}"></header>
+
+        <!-- Body Content -->
+        <main class="content-body">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">📋 Symbol Table Explorer</h3>
+                        <p class="card-subtitle">
+                            Total Symbols: <strong th:text="${totalCount}">62</strong> |
+                            Filtered Results: <strong th:text="${filteredCount}">62</strong>
+                        </p>
+                    </div>
+                    <div>
+                        <a th:href="@{/symbols/export(type=${selectedType}, scope=${selectedScope}, search=${searchQuery})}"
+                           class="btn btn-secondary btn-sm">📥 Export to CSV</a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Filter Pills via Standard Server-Side Links -->
+                    <div class="filter-pills">
+                        <a th:href="@{/symbols(type='ALL', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'ALL'} ? 'active' : ''">All Symbols</a>
+                        <a th:href="@{/symbols(type='CONTROLLER', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'CONTROLLER'} ? 'active' : ''">Controllers</a>
+                        <a th:href="@{/symbols(type='ENDPOINT', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'ENDPOINT'} ? 'active' : ''">Endpoints</a>
+                        <a th:href="@{/symbols(type='METHOD', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'METHOD'} ? 'active' : ''">Methods</a>
+                        <a th:href="@{/symbols(type='MODEL_ATTRIBUTE', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'MODEL_ATTRIBUTE'} ? 'active' : ''">Model Attributes</a>
+                        <a th:href="@{/symbols(type='TEMPLATE', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'TEMPLATE'} ? 'active' : ''">Templates</a>
+                        <a th:href="@{/symbols(type='TEMPLATE_VARIABLE', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'TEMPLATE_VARIABLE'} ? 'active' : ''">Template Vars</a>
+                        <a th:href="@{/symbols(type='CLASS', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'CLASS'} ? 'active' : ''">Classes</a>
+                        <a th:href="@{/symbols(type='PARAMETER', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'PARAMETER'} ? 'active' : ''">Parameters</a>
+                        <a th:href="@{/symbols(type='CSS_SELECTOR', scope=${selectedScope}, search=${searchQuery})}"
+                           class="filter-pill" th:classappend="${selectedType == 'CSS_SELECTOR'} ? 'active' : ''">CSS Selectors</a>
+                    </div>
+
+                    <!-- Search & Scope Form (Pure HTTP GET - Zero JS!) -->
+                    <form th:action="@{/symbols}" method="get" class="ast-toolbar">
+                        <input type="hidden" name="type" th:value="${selectedType}" />
+
+                        <div class="search-input-wrapper" style="flex: 1; max-width: 400px;">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" name="search" class="form-control search-input"
+                                   th:value="${searchQuery}" placeholder="Search name, file, or details and press Enter..." />
+                        </div>
+
+                        <div class="ast-toolbar-group">
+                            <label for="scopeSelect" style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Scope:</label>
+                            <select id="scopeSelect" name="scope" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;">
+                                <option value="ALL" th:selected="${selectedScope == 'ALL'}">All Scopes</option>
+                                <option th:each="sc : ${result.symbolScopes}" th:value="${sc}"
+                                        th:selected="${selectedScope == sc}" th:text="${sc}">global</option>
+                            </select>
+
+                            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                            <a th:href="@{/symbols}" class="btn btn-secondary btn-sm" th:if="${selectedType != 'ALL' || selectedScope != 'ALL' || !searchQuery.isEmpty()}">Reset</a>
+                        </div>
+                    </form>
+
+                    <!-- Table -->
+                    <div class="table-responsive">
+                        <table class="table-custom">
+                            <thead>
+                            <tr>
+                                <th>Symbol Name</th>
+                                <th>Type</th>
+                                <th>Scope</th>
+                                <th>Source File</th>
+                                <th>Line</th>
+                                <th>Extra Details</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="s : ${symbols}">
+                                <td><strong th:text="${s.name}">ProductController</strong></td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${s.type.name() == 'CONTROLLER'} ? 'badge-purple' : (${s.type.name() == 'ENDPOINT'} ? 'badge-info' : (${s.type.name() == 'MODEL_ATTRIBUTE'} ? 'badge-warning' : (${s.type.name() == 'TEMPLATE'} ? 'badge-success' : 'badge-gray')))"
+                                          th:text="${s.type}">CONTROLLER</span>
+                                </td>
+                                <td><code th:text="${s.scopeName}">global</code></td>
+                                <td th:text="${s.sourceFile}">ProductController.java</td>
+                                <td>
+                                    <span class="badge badge-gray" th:if="${s.lineNumber > 0}" th:text="'L' + ${s.lineNumber}">L13</span>
+                                    <span th:if="${s.lineNumber <= 0}">-</span>
+                                </td>
+                                <td th:text="${s.extraDetails}">@Controller</td>
+                            </tr>
+                            <tr th:if="${symbols.isEmpty()}">
+                                <td colspan="6" class="empty-state">No matching symbols found.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+</body>
+</html>
